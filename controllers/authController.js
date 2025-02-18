@@ -1,48 +1,79 @@
-// authController.js
+const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
-// Register
 exports.register = async (req, res) => {
-  const { username, password } = req.query; // Change here
+  const { username, email, password } = req.body;
 
   try {
-    const existingUser = await User.findOne({ username });
-    if (existingUser)
-      return res.status(400).json({ message: 'User already exists' });
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, password: hashedPassword });
-    await newUser.save();
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    res.status(201).json({ message: 'User registered successfully' });
+    user = new User({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    await user.save();
+
+    res
+      .status(201)
+      .json({ message: "User registered successfully", userId: user._id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Login
 exports.login = async (req, res) => {
-  const { username, password } = req.query; // Change here
+  const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email credentials" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid password credentials" });
+    }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+    req.session.isAuthenticated = true;
+    req.session.userId = user._id;
+    req.session.username = user.username;
+
+    res.status(200).json({
+      message: "Logged in successfully",
+      userId: user._id,
+      username: user.username,
     });
-
-    res.status(200).json({ token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
+};
+
+exports.getDashboard = (req, res) => {
+  if (!req.session.isAuthenticated) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  res.status(200).json({
+    message: "Dashboard accessed",
+    userId: req.session.userId,
+    username: req.session.username,
+  });
+};
+
+exports.logout = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Logout failed" });
+    }
+    res.status(200).json({ message: "Logged out successfully" });
+  });
 };
