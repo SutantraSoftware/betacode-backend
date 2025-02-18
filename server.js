@@ -28,8 +28,8 @@ mongoose
   });
 
 const store = new MongoDBStore({
-  uri: process.env.mongo_uri,
-  collection: "mySession",
+  uri: process.env.MONGODB_URI,
+  collection: "mySessions",
 });
 
 app.use(
