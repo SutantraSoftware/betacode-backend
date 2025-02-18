@@ -1,11 +1,11 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
-const authRoutes = require("./routes/authRoutes");
+const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 
@@ -21,7 +21,7 @@ app.use(cors());
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log("MongoDB Connected Succesfully!");
+    console.log('MongoDB Connected Succesfully!');
   })
   .catch((error) => {
     console.log(`${error}`);
@@ -29,12 +29,12 @@ mongoose
 
 const store = new MongoDBStore({
   uri: process.env.MONGODB_URI,
-  collection: "mySessions",
+  collection: 'mySessions',
 });
 
 app.use(
   session({
-    secret: "This is secret",
+    secret: 'This is secret',
     resave: false,
     saveUninitialized: false,
     store: store,
@@ -42,7 +42,7 @@ app.use(
 );
 
 //routes
-app.use("/betacode", authRoutes);
+app.use('/betacode', authRoutes);
 
 // Start the server
 app.listen(PORT, () => {

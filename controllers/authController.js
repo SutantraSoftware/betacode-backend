@@ -1,5 +1,5 @@
-const bcrypt = require("bcryptjs");
-const User = require("../models/User");
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 
 exports.register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -7,7 +7,7 @@ exports.register = async (req, res) => {
   try {
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: 'User already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -22,10 +22,10 @@ exports.register = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "User registered successfully", userId: user._id });
+      .json({ message: 'User registered successfully', userId: user._id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -35,12 +35,12 @@ exports.login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email credentials" });
+      return res.status(400).json({ message: 'Invalid email credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password credentials" });
+      return res.status(400).json({ message: 'Invalid password credentials' });
     }
 
     req.session.isAuthenticated = true;
@@ -48,22 +48,19 @@ exports.login = async (req, res) => {
     req.session.username = user.username;
 
     res.status(200).json({
-      message: "Logged in successfully",
+      message: 'Logged in successfully',
       userId: user._id,
       username: user.username,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 exports.getDashboard = (req, res) => {
-  if (!req.session.isAuthenticated) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
   res.status(200).json({
-    message: "Dashboard accessed",
+    message: 'Dashboard accessed',
     userId: req.session.userId,
     username: req.session.username,
   });
@@ -72,8 +69,8 @@ exports.getDashboard = (req, res) => {
 exports.logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).json({ message: "Logout failed" });
+      return res.status(500).json({ message: 'Logout failed' });
     }
-    res.status(200).json({ message: "Logged out successfully" });
+    res.status(200).json({ message: 'Logged out successfully' });
   });
 };
