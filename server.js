@@ -15,9 +15,11 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cors());
+
 app.use(
   cors({
-    origin: "https://myfrontend.com", // Replace with your frontend URL
+    origin: "http://localhost:4200", // Replace with your frontend URL
     credentials: true, // Allow cookies to be sent with requests
   })
 );
