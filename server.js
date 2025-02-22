@@ -16,7 +16,13 @@ app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*'); // No '*'
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true'); // Allow credentials
+  next();
+});
 
 mongoose
   .connect(process.env.MONGODB_URI)
