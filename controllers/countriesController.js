@@ -76,3 +76,12 @@ exports.deleteCountry = async (req, res) => {
     res.status(500).json({ error: 'Failed to delete country' });
   }
 };
+
+exports.getAllCountries = async (req, res) => {
+  try {
+    const posts = await Countries.find();
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).send('Error getting posts : ' + error.message);
+  }
+};

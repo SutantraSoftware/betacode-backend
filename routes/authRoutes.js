@@ -26,4 +26,6 @@ router.put(
 
 router.delete('/api/deleteCountry/:id', countriesController.deleteCountry);
 
+router.get('/api/getAllCountries', countriesController.getAllCountries);
+
 module.exports = router;
