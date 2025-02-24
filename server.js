@@ -15,14 +15,13 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
-
-app.use(
-  cors({
-    origin: "http://localhost:4200", // Replace with your frontend URL
-    credentials: true, // Allow cookies to be sent with requests
-  })
-);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:4200"); // Must match request's origin
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true"); // Allow credentials
+  next();
+});
 
 mongoose
   .connect(process.env.MONGODB_URI)
