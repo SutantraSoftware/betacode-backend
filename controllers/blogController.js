@@ -1,8 +1,12 @@
 const Blog = require("../models/Blog");
+const express = require("express");
 
 exports.getAllBlogs = async (req, res) => {
   try {
-    const posts = await Blog.find();
+    const blogs = await Blog.find();
+    if (!blogs) {
+      res.status(400).json(res.error);
+    }
     res.status(200).json(blogs);
   } catch (error) {
     res.status(500).send("Error getting posts : " + error.message);
