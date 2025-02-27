@@ -3,21 +3,21 @@ const fs = require("fs");
 
 exports.insertCountry = async (req, res) => {
   try {
-    const { country_name, country_code, imageBase64 } = req.body;
-    console.log(req);
-    const image = req.file ? req?.file?.path : null;
-    if (!country_name || !country_code || !imageBase64) {
+    const { country_name, country_code, imagePath} = req.body;
+    // const imagePath = req.file ? req?.file?.path : null;
+
+    if (!country_name || !country_code || !imagePath) {
       return res.status(400).json({ error: "Name, code & image are required" });
     }
 
-    if (!imageBase64.startsWith("data:image/")) {
+    if (!imagePath.startsWith("data:image/")) {
       return res.status(400).json({ error: "Invalid image format" });
     }
 
     const newCountry = new Countries({
       country_name,
       country_code,
-      imagePath: imageBase64,
+      imagePath,
     });
 
     await newCountry.save();
@@ -31,27 +31,27 @@ exports.insertCountry = async (req, res) => {
 exports.updateCountry = async (req, res) => {
   try {
     const { id } = req.params;
-    const { country_name, country_code, imageBase64 } = req.body;
+    const { country_name, country_code, imagePath } = req.body;
 
     let country = await Countries.findById(id);
     if (!country) {
       return res.status(404).json({ error: "Country not found" });
     }
 
-    if (imageBase64) {
-      country.imagePath = imageBase64; // Update with new base64 image
+    if (imagePath) {
+      country.imagePath = imagePath; // Update with new base64 image
     }
 
     // Delete the old image if a new one is uploaded
     if (req.file) {
-      if (country.image) {
+      if (country.imagePath) {
         fs.unlink(oldImagePath, (err) => {
           if (err) {
             console.log("Error deleting old image:", err);
           }
         });
       }
-      country.image = req.file.path; // Set new image path
+      country.imagePath = req.file.path; // Set new image path
     }
 
     // Update other fields
