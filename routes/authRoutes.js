@@ -1,11 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
+const emailController = require("../controllers/emailController")
 const countriesController = require("../controllers/countriesController");
 const checkAuthenticate = require("../middlewares/checkAuthenticate");
 const countryformController = require("../controllers/countryformController");
 const blogController = require("../controllers/blogController");
 const uploadImages = require("../middlewares/uploadImages");
+
+router.post("/api/form", emailController.sendEmail)
 
 router.post("/api/register", authController.register);
 router.post("/api/login", authController.login);

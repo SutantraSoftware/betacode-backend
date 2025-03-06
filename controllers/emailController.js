@@ -6,9 +6,9 @@ dotenv.config();
 const Mailgen = require("mailgen");
 
 exports.sendEmail = async (req, res) => {
-  const { name, email, phone, message } = req.body;
+  const { name, email, phone, service } = req.body;
 
-  const newMessage = new Contactform({ name, email, phone, message });
+  const newMessage = new Contactform({ name, email, phone, service });
   try {
     await newMessage.save();
   } catch (err) {
@@ -43,7 +43,7 @@ exports.sendEmail = async (req, res) => {
           { item: "Mr/Mrs.", description: name },
           { item: "Mail", description: email },
           { item: "Number", description: phone },
-          { item: "Message", description: message },
+          { item: "Service", description: service },
         ],
       },
     },
