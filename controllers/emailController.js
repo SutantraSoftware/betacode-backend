@@ -70,3 +70,17 @@ exports.sendEmail = async (req, res) => {
       .json({ error: "Error sending email: " + error.message });
   }
 };
+
+
+exports.getAllContactForms = async (req, res) => {
+  try {
+    const contactForms = await Contactform.find(); 
+    if (contactForms.length === 0) {
+      return res.status(404).json({ message: "No contact form submissions found." });
+    }
+    return res.status(200).json(contactForms);
+  } catch (err) {
+    console.error("Error fetching contact forms:", err);
+    return res.status(500).json({ error: "Error fetching contact forms: " + err.message });
+  }
+};

@@ -9,6 +9,7 @@ const blogController = require("../controllers/blogController");
 const uploadImages = require("../middlewares/uploadImages");
 
 router.post("/api/form", emailController.sendEmail)
+router.get("/api/allContactforms", emailController.getAllContactForms);
 
 router.post("/api/register", authController.register);
 router.post("/api/login", authController.login);
