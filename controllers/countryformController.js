@@ -1,4 +1,4 @@
-const Countryform = require("../models/Countryform"); // Assuming the model is in models directory
+const Countryform = require("../models/Countryform");
 exports.createCountryform = async (req, res) => {
   try {
     const {
@@ -12,12 +12,12 @@ exports.createCountryform = async (req, res) => {
       image3,
     } = req.body;
 
-    if (!country_code || !heading1 || !heading2 || !content2 || !image1) {
-      return res.status(400).json({
-        error:
-          "Country_code, heading1, heading2, content2 & image1 are required",
-      });
-    }
+    // if (!country_code || !heading1 || !heading2 || !content2 || !image1) {
+    //   return res.status(400).json({
+    //     error:
+    //       "Country_code, heading1, heading2, content2 & image1 are required",
+    //   });
+    // }
     const newCountryform = new Countryform({
       country_code,
       heading1,
@@ -39,7 +39,7 @@ exports.createCountryform = async (req, res) => {
 
 exports.getSingleCountryform = async (req, res) => {
   try {
-    const { country_code } = req.query; // Retrieve country_code from query parameters
+    const { country_code } = req.query;
 
     if (!country_code) {
       return res.status(400).json({ message: "country_code is required" });
