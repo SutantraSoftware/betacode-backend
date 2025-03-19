@@ -15,13 +15,30 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "http://localhost:4200"); // Must match request's origin
+//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   res.header("Access-Control-Allow-Credentials", "true"); // Allow credentials
+//   next();
+// });
+
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin",); // Must match request's origin
+  const origin = req.headers.origin;
+  
+  // Check if the origin is from localhost and follows the pattern http://localhost:<any_port>
+  const isLocalhost = /^http:\/\/localhost:\d+$/.test(origin);
+
+  if (isLocalhost) {
+    res.header("Access-Control-Allow-Origin", origin); // Allow any localhost origin with any port
+  }
+
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Credentials", "true"); // Allow credentials
   next();
 });
+
 
 mongoose
   .connect(process.env.MONGODB_URI)
