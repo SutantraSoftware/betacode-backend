@@ -1,29 +1,32 @@
 const nodemailer = require("nodemailer");
 const Contactform = require("../models/Contactform.js");
 const dotenv = require("dotenv");
+const moment = require("moment-timezone");
 dotenv.config();
 
 const Mailgen = require("mailgen");
-const moment = require("moment-timezone"); // Import moment-timezone
+
+const formatIST = (date) =>
+  moment(date).tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
 
 exports.sendEmail = async (req, res) => {
   const { name, email, phone, service } = req.body;
 
-  // Create a new contact form entry with local time for 'createdAt'
   const newMessage = new Contactform({
     name,
     email,
     phone,
     service,
+    createdAt: moment().tz("Asia/Kolkata").toDate(),
   });
 
   try {
-    await newMessage.save(); // Save the contact form with the current local time
+    await newMessage.save();
   } catch (err) {
     return res.status(500).send("Error saving to database: " + err.message);
   }
 
-  let config = {
+  let transporter = nodemailer.createTransport({
     host: "smtp.hostinger.com",
     port: 587,
     secure: false,
@@ -31,16 +34,13 @@ exports.sendEmail = async (req, res) => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
-    debug: true,
-  };
+  });
 
-  let transporter = nodemailer.createTransport(config);
-
-  let MailGenenrator = new Mailgen({
+  let MailGenerator = new Mailgen({
     theme: "cerberus",
     product: {
       name: "Betacode",
-      link: "http://betacode.com,",
+      link: "http://betacode.com",
     },
   });
 
@@ -56,14 +56,14 @@ exports.sendEmail = async (req, res) => {
           { item: "Service", description: service },
           {
             item: "Submission Time",
-            description: moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"), // Format the local time for email
+            description: formatIST(newMessage.createdAt),
           },
         ],
       },
     },
   };
 
-  let mail = MailGenenrator.generate(response);
+  let mail = MailGenerator.generate(response);
 
   let information = {
     from: process.env.EMAIL_USER,
@@ -85,16 +85,28 @@ exports.sendEmail = async (req, res) => {
   }
 };
 
-
 exports.getAllContactForms = async (req, res) => {
   try {
-    const contactForms = await Contactform.find(); 
+    const contactForms = await Contactform.find();
+
     if (contactForms.length === 0) {
-      return res.status(404).json({ message: "No Enquiry form submissions found." });
+      return res
+        .status(404)
+        .json({ message: "No Enquiry form submissions found." });
     }
-    return res.status(200).json(contactForms);
+
+    const formattedForms = contactForms.map((form) => ({
+      ...form._doc,
+      createdAt: moment(form.createdAt)
+        .tz("Asia/Kolkata")
+        .format("YYYY-MM-DD hh:mm A"),
+    }));
+
+    return res.status(200).json(formattedForms);
   } catch (err) {
     console.error("Error fetching Enquiry forms:", err);
-    return res.status(500).json({ error: "Error fetching Enquiry forms: " + err.message });
+    return res
+      .status(500)
+      .json({ error: "Error fetching Enquiry forms: " + err.message });
   }
 };
