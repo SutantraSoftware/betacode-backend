@@ -6,10 +6,14 @@ const countriesController = require("../controllers/countriesController");
 const checkAuthenticate = require("../middlewares/checkAuthenticate");
 const countryformController = require("../controllers/countryformController");
 const blogController = require("../controllers/blogController");
+const maincontactusController = require("../controllers/maincontactusController")
 const uploadImages = require("../middlewares/uploadImages");
 
 router.post("/api/form", emailController.sendEmail)
-router.get("/api/allContactforms", emailController.getAllContactForms);
+router.get("/api/allContactforms", emailController.getAllContactForms); 
+
+router.post("/api/contactusform", maincontactusController.sendEmail)
+router.get("/api/allcontactusforms", maincontactusController.getAllContactForms);
 
 router.post("/api/register", authController.register);
 router.post("/api/login", authController.login);

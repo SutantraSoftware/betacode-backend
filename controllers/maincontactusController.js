@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const Contactform = require("../models/Contactform.js");
+const Maincontactus = require("../models/Maincontactus.js");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -7,14 +7,16 @@ const Mailgen = require("mailgen");
 const moment = require("moment-timezone"); // Import moment-timezone
 
 exports.sendEmail = async (req, res) => {
-  const { name, email, phone, service } = req.body;
+  const { name, email, phone, project, subject, message } = req.body;
 
   // Create a new contact form entry with local time for 'createdAt'
-  const newMessage = new Contactform({
+  const newMessage = new Maincontactus({
     name,
     email,
     phone,
-    service,
+    project,
+    subject,
+    message
   });
 
   try {
@@ -53,7 +55,9 @@ exports.sendEmail = async (req, res) => {
           { item: "Mr/Mrs.", description: name },
           { item: "Mail", description: email },
           { item: "Number", description: phone },
-          { item: "Service", description: service },
+          { item: "project", description: project  },
+          { item: "subject", description: subject  },
+          { item: "message", description: message  },
           {
             item: "Submission Time",
             description: moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"), // Format the local time for email
@@ -75,7 +79,7 @@ exports.sendEmail = async (req, res) => {
   try {
     await transporter.sendMail(information);
     return res.status(201).json({
-      msg: "Enquiry form submitted successfully",
+      msg: "Contact form submitted successfully",
     });
   } catch (error) {
     console.error("Error sending email:", error);
@@ -88,13 +92,13 @@ exports.sendEmail = async (req, res) => {
 
 exports.getAllContactForms = async (req, res) => {
   try {
-    const contactForms = await Contactform.find(); 
-    if (contactForms.length === 0) {
-      return res.status(404).json({ message: "No Enquiry form submissions found." });
+    const MaincontactusForms = await Maincontactus.find(); 
+    if (MaincontactusForms.length === 0) {
+      return res.status(404).json({ message: "No contactus form submissions found." });
     }
-    return res.status(200).json(contactForms);
+    return res.status(200).json(MaincontactusForms);
   } catch (err) {
-    console.error("Error fetching Enquiry forms:", err);
-    return res.status(500).json({ error: "Error fetching Enquiry forms: " + err.message });
+    console.error("Error fetching contact forms:", err);
+    return res.status(500).json({ error: "Error fetching contact forms: " + err.message });
   }
 };
