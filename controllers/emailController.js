@@ -4,16 +4,25 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const Mailgen = require("mailgen");
+const moment = require("moment-timezone"); // Import moment-timezone
 
 exports.sendEmail = async (req, res) => {
   const { name, email, phone, service } = req.body;
 
-  const newMessage = new Contactform({ name, email, phone, service });
+  // Create a new contact form entry with local time for 'createdAt'
+  const newMessage = new Contactform({
+    name,
+    email,
+    phone,
+    service,
+  });
+
   try {
-    await newMessage.save();
+    await newMessage.save(); // Save the contact form with the current local time
   } catch (err) {
     return res.status(500).send("Error saving to database: " + err.message);
   }
+
   let config = {
     host: "smtp.hostinger.com",
     port: 587,
@@ -24,6 +33,7 @@ exports.sendEmail = async (req, res) => {
     },
     debug: true,
   };
+
   let transporter = nodemailer.createTransport(config);
 
   let MailGenenrator = new Mailgen({
@@ -44,6 +54,10 @@ exports.sendEmail = async (req, res) => {
           { item: "Mail", description: email },
           { item: "Number", description: phone },
           { item: "Service", description: service },
+          {
+            item: "Submission Time",
+            description: moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"), // Format the local time for email
+          },
         ],
       },
     },
