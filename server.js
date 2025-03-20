@@ -1,11 +1,11 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
-const authRoutes = require("./routes/authRoutes");
+const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 
@@ -25,25 +25,25 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  
-  // Check if the origin is from localhost and follows the pattern http://localhost:<any_port>
   const isLocalhost = /^http:\/\/localhost:\d+$/.test(origin);
 
   if (isLocalhost) {
-    res.header("Access-Control-Allow-Origin", origin); // Allow any localhost origin with any port
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header(
+      'Access-Control-Allow-Origin',
+      'https://betacodeprofessionalconsultants.com'
+    );
   }
 
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true"); // Allow credentials
-  next();
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
 });
-
 
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log("MongoDB Connected Succesfully!");
+    console.log('MongoDB Connected Succesfully!');
   })
   .catch((error) => {
     console.log(`${error}`);
@@ -51,25 +51,25 @@ mongoose
 
 const store = new MongoDBStore({
   uri: process.env.MONGODB_URI,
-  collection: "mySessions",
+  collection: 'mySessions',
 });
 
 app.use(
   session({
-    secret: "This is secret",
+    secret: 'This is secret',
     resave: false,
     saveUninitialized: false,
     store: store,
     cookie: {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
+      sameSite: 'lax',
     },
   })
 );
 
 //routes
-app.use("/betacode", authRoutes);
+app.use('/betacode', authRoutes);
 
 // Start the server
 app.listen(PORT, () => {
